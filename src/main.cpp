@@ -1,4 +1,7 @@
 #include "App.h"
+#include "Input.h"
+#include <iostream>
+#include <stdint.h>
 
 class TestApp : public App
 {
@@ -8,9 +11,8 @@ public:
 
 	// OVERRIDES
 	bool Init() override;
-	void Update(float dt) override;
+	void Update(float deltaTime) override;
 	void Render() override;
-	LRESULT MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 };
 
 TestApp::TestApp(int width, int height, const char* title) : App(width, height, title)
@@ -31,35 +33,27 @@ bool TestApp::Init()
 	return true;
 }
 
-void TestApp::Update(float dt)
+void TestApp::Update(float deltaTime)
 {
-
+	if (Input::GetKeyPressed() == 0x1B)
+	{
+		TestApp::Quit();
+	}
+	//std::cout << Time::deltaTime << std::endl;
 }
 
 void TestApp::Render()
 {
 	glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glBegin(GL_QUADS);
+	glVertex2f( 0.5f,  0.5f);
+	glVertex2f( 0.5f, -0.5f);
+	glVertex2f(-0.5f, -0.5f);
+	glVertex2f(-0.5f,  0.5f);
+	glEnd();
 }
-
-LRESULT TestApp::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	switch (msg)
-	{
-	default:
-		return App::MsgProc(hWnd, msg, wParam, lParam);
-		break;
-	}
-}
-
-/*int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
-{
-	TestApp app(hInstance);
-
-	if (!app.Init())
-		return 1;
-	return app.Run();
-}*/
 
 int main()
 {

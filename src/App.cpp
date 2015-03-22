@@ -1,4 +1,18 @@
+//////////////////////////////////////////////////////////////
+//	SIREN ENGINE											//
+//	Copyright 2015 Mario Month								//
+//															//
+//	APP.CPP													//
+//	This class runs the main application loop for the		//
+//	engine. It initializes the window, OpenGL, and			//
+//	registers for input. It also processes the messages		//
+//	provided by the OS.										//
+//////////////////////////////////////////////////////////////
+
 #include "App.h"
+#include "Input.h"
+#include "SRN_Platform.h"
+#include <iostream>
 
 namespace
 {
@@ -13,8 +27,18 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
+
+//////////////////////////////////////////////////////////////
+//	CLASS CONSTRUCTOR										//
+//															//
+//	@PARAM: int width - the width of the window				//
+//	@PARAM: int height - the height of the window			//
+//	@PARAM: const char* title - the title of the window		//
+//////////////////////////////////////////////////////////////
+
 App::App(int width, int height, const char* title)
 {
+#ifdef SRN_OS_WINDOWS
 	m_hAppInst = GetModuleHandle(NULL);
 	m_hWnd = NULL;
 	m_hDC = NULL;
@@ -23,26 +47,39 @@ App::App(int width, int height, const char* title)
 	m_ClientHeight = height;
 	m_AppTitle = (LPSTR)title;
 	m_WndStyle = WS_OVERLAPPED | WS_SYSMENU | WS_CAPTION | WS_MINIMIZEBOX;
-	m_FPS = 0.0f;
 	g_pApp = this;
+
+	// REGISTER INPUT DEVICES
+	Input::RegisterInputDevices();
+#endif
 }
+
+//////////////////////////////////////////////////////////////
+//	CLASS DESTRUCTOR										//
+//															//
+//	TODO: Implement default destructor (if needed)			//
+//////////////////////////////////////////////////////////////
 
 App::~App()
 {
 }
 
-// MAIN APPLICATION LOOP
+//////////////////////////////////////////////////////////////
+//	MAIN APPLICATION LOOP									//
+//															//
+//	This method should be called by the client. It			//
+//	checks for messages and then calls the update and		//
+//	methods that are created by the user.					//
+//															//
+//	@RETURN - 0 when terminated								//
+//////////////////////////////////////////////////////////////
+
 int App::Run()
 {
-	// CALCULATE TIMING
-	__int64 prevTime = 0;
-	QueryPerformanceCounter((LARGE_INTEGER*)&prevTime);
+#ifdef SRN_OS_WINDOWS
 
-	__int64 countsPerSec = 0;
-	QueryPerformanceFrequency((LARGE_INTEGER*)&countsPerSec);
-	float secondsPerCount = 1.0f / countsPerSec;
+	float secspercount = Time::getSecondsPerCount();
 
-	// MAIN MESSAGE LOOP
 	MSG msg = { 0 };
 	while (WM_QUIT != msg.message)
 	{
@@ -53,32 +90,37 @@ int App::Run()
 		}
 		else
 		{
-			// CALCULATE DELTA TIME
-			__int64 curTime = 0;
-			QueryPerformanceCounter((LARGE_INTEGER*)&curTime);
-			float deltaTime = (curTime - prevTime) * secondsPerCount;
+			float deltaTime = Time::getDeltaTime(secspercount);
 
-			// UPDATE
 			Update(deltaTime);
-			// RENDER
 			Render();
-			// CALCULATE FPS
-			CalculateFPS(deltaTime);
-			// SWAP BUFFERS
-			SwapBuffers(m_hDC);
+			Time::calculateFPS(deltaTime);
+			UpdateWindow();
+			SwapBuffers(m_hDC);	
 
-			// RESET PREVIOUS TIME FOR NEXT FRAME
-			prevTime = curTime;
-			
+			Time::resetTime();
 		}
 	}
 	Shutdown();
 	return static_cast<int>(msg.wParam);
+#endif
 }
+
+//////////////////////////////////////////////////////////////
+//	INITIALIZE WINDOW METHOD								//
+//															//
+//	This method provides the necessary parameters to		//
+//	Windows OS for initializing a WIN32 window. It also		//
+//	handles registering the window class, adjusting the		//
+//	window to the client's specified size, creating the		//
+//	window, and then displaying it.							//
+//															//
+//	@RETURN - true when completed							//
+//////////////////////////////////////////////////////////////
 
 bool App::InitWindow()
 {
-	// WNDCLASSEX STRUCTURE
+#ifdef SRN_OS_WINDOWS
 	WNDCLASSEX wcex;
 	ZeroMemory(&wcex, sizeof(WNDCLASSEX));
 	wcex.cbClsExtra = 0;
@@ -103,18 +145,28 @@ bool App::InitWindow()
 	int x = GetSystemMetrics(SM_CXSCREEN) / 2 - width / 2;
 	int y = GetSystemMetrics(SM_CYSCREEN) / 2 - height / 2;
 
-	// CREATE WINDOW
 	m_hWnd = CreateWindow("APPWNDCLASS", m_AppTitle, m_WndStyle, x, y, width, height, NULL, NULL, m_hAppInst, NULL);
 	if (!m_hWnd) return OutErrorMsg("Failed to create window.");
 
-	// SHOW WINDOW
 	ShowWindow(m_hWnd, SW_SHOW);
+#endif
 
 	return true;
 }
 
+//////////////////////////////////////////////////////////////
+//	INITIALIZE OPENGL METHOD								//
+//															//
+//	This method initializes OpenGL by specifying the		//
+//	necessary parameters, creating a device context and		//
+//	rendering context, and initializing GLEW.				//
+//															//
+//	@RETURN - true when completed							//
+//////////////////////////////////////////////////////////////
+
 bool App::InitGL()
 {
+#ifdef SRN_OS_WINDOWS
 	// CREATE DEVICE CONTEXT
 	m_hDC = GetDC(m_hWnd);
 
@@ -136,24 +188,41 @@ bool App::InitGL()
 	m_hRC = wglCreateContext(m_hDC);
 	if (!wglMakeCurrent(m_hDC, m_hRC))
 		return OutErrorMsg("Failed to create and activate render context");
+#endif
 
-	// INITIALIZE GLU
+	// INITIALIZE GLEW
 	if (glewInit())
 		return OutErrorMsg("Failed to initialize glew.");
 
 	return true;
 }
 
+//////////////////////////////////////////////////////////////
+//	INITIALIZATION METHOD									//
+//															//
+//	This method calls the InitWindow and InitGL methods		//
+//	and can be overriden by the client.						//
+//															//
+//	@RETURN - true when completed							//
+//////////////////////////////////////////////////////////////
+
 bool App::Init()
 {
 	if (!InitWindow()) return false;
 	if (!InitGL()) return false;
 
-
-	
 	return true;
 }
 
+//////////////////////////////////////////////////////////////
+//	MAIN MESSAGE PROCESSOR									//
+//															//
+//	This method checks the messages from Windows and		//
+//	calls the correct methods depending on the type of		//
+//	message.												//
+//////////////////////////////////////////////////////////////
+
+#ifdef SRN_OS_WINDOWS
 LRESULT App::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
@@ -162,35 +231,55 @@ LRESULT App::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		PostQuitMessage(0);
 		return 0;
 
+	case WM_INPUT:
+		return Input::ProcessInput(lParam);
+
 	default:
 		return DefWindowProc(hWnd, msg, wParam, lParam);
 	}
 }
+#endif
 
-void App::CalculateFPS(float dt)
-{
-	static float elapsed = 0;
-	static int frameCnt = 0;
-
-	elapsed += dt;
-	frameCnt++;
-	if (elapsed >= 1.0f)
-	{
-		m_FPS = (float)frameCnt;
-
-		// OUTPUT TO WINDOW TITLE
-		std::stringstream ss;
-		ss << m_AppTitle << " v" << glGetString(GL_VERSION) << " | FPS: " << m_FPS << " | Renderer: " << glGetString(GL_RENDERER);
-		SetWindowText(m_hWnd, ss.str().c_str());
-
-		elapsed = 0.0f;
-		frameCnt = 0;
-	}
-}
+//////////////////////////////////////////////////////////////
+//	SHUTDOWN METHOD											//
+//															//
+//	This method properly shutdowns OpenGL.					//
+//////////////////////////////////////////////////////////////
 
 void App::Shutdown()
 {
 	wglMakeCurrent(NULL, NULL);
 	wglDeleteContext(m_hRC);
 	ReleaseDC(m_hWnd, m_hDC);
+}
+
+//////////////////////////////////////////////////////////////
+//	UPDATE WINDOW METHOD (PRIVATE)							//
+//															//
+//	This method is a helper function to update the window	//
+//	title based on the version of OpenGL, the FPS, and		//
+//	the client's renderer.									//
+//////////////////////////////////////////////////////////////
+
+void App::UpdateWindow()
+{
+#ifdef SRN_OS_WINDOWS
+	std::stringstream ss;
+	ss << m_AppTitle << " v" << glGetString(GL_VERSION) << " | FPS: " << Time::getFPS() << " | Renderer: " << glGetString(GL_RENDERER);
+	SetWindowText(m_hWnd, ss.str().c_str());
+#endif
+}
+
+//////////////////////////////////////////////////////////////
+//	QUIT METHOD												//
+//															//
+//	This method is called by a client to immediately		//
+//	quit the application.									//
+//////////////////////////////////////////////////////////////
+
+void App::Quit()
+{
+#ifdef SRN_OS_WINDOWS
+	PostQuitMessage(0);
+#endif
 }

@@ -1,21 +1,22 @@
 #pragma once
 
 #include "GLUtil.h"
+#include "Time.h"
 
 class App
 {
 public:
 	App(int width, int height, const char* title);
 	virtual ~App();
-
-	// MAIN APPLICATION LOOP
 	int Run();
-
-	// FRAMEWORK METHODS
+	void Quit();
 	virtual bool Init();
-	virtual void Update(float dt) = 0;
-	virtual void Render() = 0;
 	virtual LRESULT MsgProc(HWND, UINT, WPARAM, LPARAM);
+	virtual void Update(float deltaTime) = 0;
+	virtual void Render() = 0;
+
+private:
+	void UpdateWindow();
 
 protected:
 	HWND						m_hWnd;
@@ -26,14 +27,9 @@ protected:
 	UINT						m_ClientHeight;
 	DWORD						m_WndStyle;
 	char*						m_AppTitle;
-	float						m_FPS;
 
 	bool InitWindow();
-
 	bool InitGL();
-
-	void CalculateFPS(float dt);
-
 	void Shutdown();
 };
 
