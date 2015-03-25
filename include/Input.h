@@ -1,14 +1,24 @@
+#ifndef SRN_INPUT_H
+#define SRN_INPUT_H
+
+#include <SRN_Platform.h>
 #include <Windows.h>
 
-class Input
-{
-public:
-	Input();
-	~Input();
-	static int ProcessInput(LPARAM lParam);
-	static void RegisterInputDevices();
-	static USHORT GetKeyPressed();
+namespace Siren {
 
-private:
-	static USHORT key;
-};
+	class SRN_API Input
+	{
+	public:
+		Input();
+		~Input();
+		static int ProcessInput(LPARAM lParam);
+		static void RegisterInputDevices();
+		static USHORT GetKeyPressed();
+
+	private:
+		static USHORT key;
+	};
+
+}
+
+#endif

@@ -1,35 +1,61 @@
-#pragma once
+#ifndef SRN_APP_H
+#define SRN_APP_H
 
-#include "GLUtil.h"
-#include "Time.h"
+#include <SRN_Platform.h>
+#include <GLUtil.h>
+#include <Time.h>
+#include <Input.h>
 
-class App
-{
-public:
-	App(int width, int height, const char* title);
-	virtual ~App();
-	int Run();
-	void Quit();
-	virtual bool Init();
-	virtual LRESULT MsgProc(HWND, UINT, WPARAM, LPARAM);
-	virtual void Update(float deltaTime) = 0;
-	virtual void Render() = 0;
+namespace Siren {
 
-private:
-	void UpdateWindow();
+	class SRN_API App
+	{
+	public:
+		// Constructor & Destructor
+		App(int width, int height, const char* title);
+		virtual ~App();
 
-protected:
-	HWND						m_hWnd;
-	HINSTANCE					m_hAppInst;
-	HDC							m_hDC;
-	HGLRC						m_hRC;
-	UINT						m_ClientWidth;
-	UINT						m_ClientHeight;
-	DWORD						m_WndStyle;
-	char*						m_AppTitle;
+		// Client called methods
+		int Run();
+		void Quit();
+		virtual bool Init();
 
-	bool InitWindow();
-	bool InitGL();
-	void Shutdown();
-};
+		// Message Handler
+		virtual LRESULT MsgProc(HWND, UINT, WPARAM, LPARAM);
+		static LRESULT MainWndProc(HWND, UINT, WPARAM, LPARAM); //DELETE THIS
 
+		// Interface Methods
+		virtual void Update(float deltaTime) = 0;
+		virtual void Render() = 0;
+
+		// Getters & Setters
+		void setTitle(char* title);
+		char* getTitle();
+		void setWidth(UINT width);
+		UINT getWidth();
+		void setHeight(UINT height);
+		UINT getHeight();
+
+	private:
+		// Delete this method before release
+		//void UpdateWindow();
+
+	protected:
+		HWND						m_hWnd;
+		HWND						m_hWnd_Child; //DELETE THIS
+		HINSTANCE					m_hAppInst;
+		HDC							m_hDC;
+		HGLRC						m_hRC;
+		UINT						m_ClientWidth;
+		UINT						m_ClientHeight;
+		DWORD						m_WndStyle;
+		char*						m_AppTitle;
+
+		bool InitWindow();
+		bool InitGL(HWND); //REMOVE HWND
+		void Shutdown();
+	};
+
+}
+
+#endif

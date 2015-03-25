@@ -1,34 +1,39 @@
-#include "Windows.h"
-
 #ifndef TIME_H
 #define TIME_H
 
-static class Time
-{
-public:
-	// Constructor
-	Time();
+#include <SRN_Platform.h>
+#include <Windows.h>
 
-	static float fps;
-	static float deltaTime;
+namespace Siren {
 
-	//****************************************//
-	//	METHODS FOR FPS                       //
-	//****************************************//
-	static float getFPS();
+	static class SRN_API Time
+	{
+	public:
+		// Constructor
+		Time();
 
-	static float getSecondsPerCount();
-	static float getDeltaTime(float secondsPerCount);
-	static void resetTime();
-	static void calculateFPS(float deltaTime);
+		static float fps;
+		static float deltaTime;
 
-private:
-	static __int64 prevTime;
-	static __int64 countsPerSec;
-	static __int64 curTime;
-	static float secondsPerCount;
+		//****************************************//
+		//	METHODS FOR FPS                       //
+		//****************************************//
+		static float getFPS();
 
-	static __int64 getPrevTime();
-};
+		static float getSecondsPerCount();
+		static float getDeltaTime(float secondsPerCount);
+		static void resetTime();
+		static void calculateFPS(float deltaTime);
+
+	private:
+		static __int64 prevTime;
+		static __int64 countsPerSec;
+		static __int64 curTime;
+		static float secondsPerCount;
+
+		static __int64 getPrevTime();
+	};
+
+}
 
 #endif

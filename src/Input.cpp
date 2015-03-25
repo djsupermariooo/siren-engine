@@ -2,6 +2,8 @@
 #include "SRN_Platform.h"
 #include <iostream>
 
+using namespace Siren;
+
 USHORT Input::key;
 
 Input::Input()

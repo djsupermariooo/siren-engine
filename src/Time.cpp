@@ -13,6 +13,8 @@
 #include <iostream>
 #include <stdint.h>
 
+using namespace Siren;
+
 //////////////////////////////////////////////////////////////
 //	STATIC VARIABLES										//
 //////////////////////////////////////////////////////////////
@@ -74,4 +76,3 @@ __int64 Time::getPrevTime()
 {
 	return prevTime;
 }
-

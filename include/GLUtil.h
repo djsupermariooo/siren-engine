@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SRN_GLUTIL_H
+#define SRN_GLUTIL_H
 
 #include <Windows.h>
 #include <string>
@@ -12,3 +13,5 @@
 #include <gl/wglext.h>
 
 bool OutErrorMsg(const char* message);
+
+#endif
