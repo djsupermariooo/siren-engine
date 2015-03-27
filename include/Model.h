@@ -8,20 +8,15 @@
 #include <Shader.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <vector>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform2.hpp>
 using namespace glm;
+using namespace std;
 
 namespace Siren {
-
-	class SRN_API Vertex3
-	{
-	public:
-		float xyz[3];
-		float rgba[4];
-	};
 
 	class SRN_API Model
 	{
@@ -34,8 +29,10 @@ namespace Siren {
 		Model() { Scale = vec3(1.0f, 1.0f, 1.0f); }
 		~Model() { Destroy(); }
 
-		void Initialize(Vertex3 vertices[], int length, std::string strVertex, std::string strFragment);
+		void Initialize(vector<glm::vec3> verts, vector<glm::vec2> uvs, vector<glm::vec3> normals, std::string strVertex, std::string strFragment);
 		void Render();
+
+		void Display(mat4 viewMatrix, vec3 position);
 
 		vec3 GetPosition() { return Position; }
 		void SetPosition(vec3 position) { Position = position; }
@@ -53,9 +50,9 @@ namespace Siren {
 		void Destroy();
 
 	private:
-		Vertex3 *Vertices;
-		GLint VerticesLength;
+		GLuint VerticesLength;
 		GLuint VertexBufferId;
+		GLuint ElementBufferId;
 		GLuint VertexArrayObjectId;
 
 		vec3 Position;

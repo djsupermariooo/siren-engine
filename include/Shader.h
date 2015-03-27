@@ -5,6 +5,7 @@
 #include <gl\glew.h>
 #include <fstream>
 #include <string>
+#include <iostream>
 
 namespace Siren {
 
@@ -30,6 +31,11 @@ namespace Siren {
 
 		void TurnOn() { glUseProgram(ShaderProgramId); }
 		void TurnOff() { glUseProgram(0); }
+
+		GLuint getShaderProgramId()
+		{
+			return ShaderProgramId;
+		}
 
 		void Destroy();
 

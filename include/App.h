@@ -50,6 +50,8 @@ namespace Siren {
 		UINT						m_ClientHeight;
 		DWORD						m_WndStyle;
 		char*						m_AppTitle;
+		bool						displayPyramid = false;
+		bool						displayCube = false;
 
 		bool InitWindow();
 		bool InitGL(HWND); //REMOVE HWND

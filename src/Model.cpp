@@ -1,15 +1,16 @@
 #include <Model.h>
+#include <iostream>
+#include <Time.h>
 
 using namespace Siren;
 
 Shader shader;
 
-void Model::Initialize(Vertex3 vertices[], int length, std::string strVertex, std::string strFragment)
+void Model::Initialize(vector<glm::vec3> verts, vector<glm::vec2> uvs, vector<glm::vec3> normals, std::string strVertex, std::string strFragment)
 {
 	shader.Initialize(strVertex, strFragment);
 
-	Vertices = vertices;
-	VerticesLength = length;
+	VerticesLength = verts.size();
 
 	GLenum ErrorCheckValue = glGetError();
 
@@ -19,11 +20,9 @@ void Model::Initialize(Vertex3 vertices[], int length, std::string strVertex, st
 	glGenBuffers(1, &VertexBufferId);
 	glBindBuffer(GL_ARRAY_BUFFER, VertexBufferId);
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices[0]) * length, Vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(&verts[0]) * verts.size(), &verts[0], GL_STATIC_DRAW);
 
-	glVertexAttribPointer(kVertexIndex, 3, GL_FLOAT, GL_FALSE, sizeof(Vertices[0]), 0);
-
-	glVertexAttribPointer(kColorIndex, 4, GL_FLOAT, GL_FALSE, sizeof(Vertices[0]), (GLvoid*)sizeof(Vertices[0].xyz));
+	glVertexAttribPointer(kVertexIndex, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
 
 	ErrorCheckValue = glGetError();
 
@@ -48,21 +47,18 @@ void Model::Render()
 	GLint viewMatrixId = shader.GetVariable("viewMatrix");
 	GLint projectionMatrixId = shader.GetVariable("projectionMatrix");
 
-	shader.SetMatrix4(modelMatrixId, 1, false, &modelMatrix[0][0]);
-	shader.SetMatrix4(viewMatrixId, 1, false, &ViewMatrix[0][0]);
-	shader.SetMatrix4(projectionMatrixId, 1, false, &ProjectionMatrix[0][0]);
+	shader.SetMatrix4(modelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
+	shader.SetMatrix4(viewMatrixId, 1, GL_FALSE, &ViewMatrix[0][0]);
+	shader.SetMatrix4(projectionMatrixId, 1, GL_FALSE, &ProjectionMatrix[0][0]);
 
 	glBindVertexArray(VertexArrayObjectId);
 
 	glEnableVertexAttribArray(kVertexIndex);
 
-	glEnableVertexAttribArray(kColorIndex);
-
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glBindBuffer(GL_ARRAY_BUFFER, VertexBufferId);
 
 	glDrawArrays(GL_TRIANGLES, 0, VerticesLength);
-
-	glDisableVertexAttribArray(kColorIndex);
 
 	glDisableVertexAttribArray(kVertexIndex);
 
@@ -88,4 +84,12 @@ void Model::Destroy()
 	}
 
 	shader.Destroy();
+}
+
+void Model::Display(mat4 viewMatrix, vec3 position)
+{
+	SetViewMatrix(viewMatrix);
+	SetPosition(position);
+
+	Render();
 }

@@ -1,4 +1,9 @@
+#define BTN_PYRAMID 100
+#define BTN_CUBE 101
+
 #include "App.h"
+
+#include <iostream>
 
 using namespace Siren;
 
@@ -155,6 +160,23 @@ LRESULT App::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		return 0;
 	case WM_INPUT:
 		Input::ProcessInput(lParam);
+	case WM_COMMAND:
+		if (LOWORD(wParam) == BTN_PYRAMID)
+		{
+			if (HIWORD(wParam) == BN_CLICKED)
+			{
+				displayCube = false;
+				displayPyramid = true;
+			}
+		}
+		else if(LOWORD(wParam) == BTN_CUBE)
+		{
+			if (HIWORD(wParam) == BN_CLICKED)
+			{
+				displayPyramid = false;
+				displayCube = true;
+			}
+		}
 
 	default:
 		return DefWindowProc(hWnd, msg, wParam, lParam);

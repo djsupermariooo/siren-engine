@@ -1,10 +1,12 @@
 #include <Shader.h>
+#include <iostream>
+#include <vector>
 
 using namespace Siren;
 
 std::string Shader::LoadShaderFile(std::string strFile)
 {
-	std::ifstream fin(strFile.c_str());
+	std::ifstream fin(strFile);
 
 	if (!fin)
 		return "";
@@ -18,6 +20,8 @@ std::string Shader::LoadShaderFile(std::string strFile)
 	}
 
 	fin.close();
+
+	std::cout << strText << std::endl;
 
 	return strText;
 }
@@ -37,14 +41,14 @@ void Shader::Initialize(std::string strVertexFile, std::string strFragmentFile)
 	VertexShaderId = glCreateShader(GL_VERTEX_SHADER);
 	FragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
 
-	strVShader = LoadShaderFile(strVertexFile.c_str());
-	strFShader = LoadShaderFile(strFragmentFile.c_str());
+	strVShader = LoadShaderFile(strVertexFile);
+	strFShader = LoadShaderFile(strFragmentFile);
 
 	const char *szVShader = strVShader.c_str();
 	const char *szFShader = strFShader.c_str();
 
-	glShaderSource(VertexShaderId, 1, &szVShader, nullptr);
-	glShaderSource(FragmentShaderId, 1, &szFShader, nullptr);
+	glShaderSource(VertexShaderId, 1, &szVShader, NULL);
+	glShaderSource(FragmentShaderId, 1, &szFShader, NULL);
 
 	glCompileShader(VertexShaderId);
 	glCompileShader(FragmentShaderId);
