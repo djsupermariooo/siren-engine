@@ -1,5 +1,3 @@
-test
-
 #ifndef SRN_APP_H
 #define SRN_APP_H
 
