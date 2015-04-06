@@ -33,4 +33,4 @@
 	#define SRN_API SRN_API
 //#endif
 
-#endif
+#endif // SRN_PLATFORM_H

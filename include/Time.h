@@ -1,7 +1,8 @@
-#ifndef TIME_H
-#define TIME_H
+#ifndef SRN_TIME_H
+#define SRN_TIME_H
 
 #include <SRN_Platform.h>
+
 #include <Windows.h>
 
 namespace Siren {
@@ -9,15 +10,11 @@ namespace Siren {
 	static class SRN_API Time
 	{
 	public:
-		// Constructor
 		Time();
 
 		static float fps;
 		static float deltaTime;
 
-		//****************************************//
-		//	METHODS FOR FPS                       //
-		//****************************************//
 		static float getFPS();
 
 		static float getSecondsPerCount();
@@ -36,4 +33,4 @@ namespace Siren {
 
 }
 
-#endif
+#endif // SRN_TIME_H

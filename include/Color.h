@@ -170,4 +170,4 @@ namespace Siren {
 		static const Color Black = Color(0.0f, 0.0f, 0.0f, 1.0f);						//RGBA: {0.0f, 0.0f, 0.0f, 1.0f}
 	}
 }
-#endif
+#endif // SRN_COLOR_H

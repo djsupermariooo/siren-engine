@@ -21,8 +21,6 @@ std::string Shader::LoadShaderFile(std::string strFile)
 
 	fin.close();
 
-	std::cout << strText << std::endl;
-
 	return strText;
 }
 
@@ -51,7 +49,25 @@ void Shader::Initialize(std::string strVertexFile, std::string strFragmentFile)
 	glShaderSource(FragmentShaderId, 1, &szFShader, NULL);
 
 	glCompileShader(VertexShaderId);
+	char error[1000];
+	glGetShaderInfoLog(VertexShaderId, 1000, NULL, error);
+	std::cout << "Compile status: \n" << error << std::endl;
+	GLint success = 0;
+	glGetShaderiv(VertexShaderId, GL_COMPILE_STATUS, &success);
+	if (success == GL_FALSE)
+		std::cout << "Failed\n" << std::endl;
+	else
+		std::cout << "Success\n" << std::endl;
+
 	glCompileShader(FragmentShaderId);
+	glGetShaderInfoLog(FragmentShaderId, 1000, NULL, error);
+	std::cout << "Compile status: \n" << error << std::endl;
+	success = 0;
+	glGetShaderiv(FragmentShaderId, GL_COMPILE_STATUS, &success);
+	if (success == GL_FALSE)
+		std::cout << "Failed\n" << std::endl;
+	else
+		std::cout << "Success\n" << std::endl;
 
 	ShaderProgramId = glCreateProgram();
 
@@ -59,6 +75,14 @@ void Shader::Initialize(std::string strVertexFile, std::string strFragmentFile)
 	glAttachShader(ShaderProgramId, FragmentShaderId);
 
 	glLinkProgram(ShaderProgramId);
+	glGetProgramInfoLog(ShaderProgramId, 1000, NULL, error);
+	std::cout << "Link status: \n" << error << std::endl;
+	success = 0;
+	glGetProgramiv(ShaderProgramId, GL_LINK_STATUS, &success);
+	if (success == GL_FALSE)
+		std::cout << "Failed\n" << std::endl;
+	else
+		std::cout << "Success\n" << std::endl;
 
 	ErrorCheckValue = glGetError();
 
@@ -66,7 +90,7 @@ void Shader::Initialize(std::string strVertexFile, std::string strFragmentFile)
 	{
 		fprintf(stderr, "ERROR: Could not create the shader program with error Id: %d\n", ErrorCheckValue);
 		exit(-1);
-	}
+	} 
 }
 
 GLint Shader::GetVariable(std::string strVariable)

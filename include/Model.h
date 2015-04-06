@@ -29,9 +29,6 @@ namespace Siren {
 		Model() { Scale = vec3(1.0f, 1.0f, 1.0f); }
 		~Model() { Destroy(); }
 
-		void Initialize(vector<glm::vec3> verts, vector<glm::vec2> uvs, vector<glm::vec3> normals, std::string strVertex, std::string strFragment);
-		void Render();
-
 		void Display(mat4 viewMatrix, vec3 position);
 
 		vec3 GetPosition() { return Position; }
@@ -55,12 +52,12 @@ namespace Siren {
 		GLuint ElementBufferId;
 		GLuint VertexArrayObjectId;
 
+		
+		mat4 ViewMatrix;
+		mat4 ProjectionMatrix;
 		vec3 Position;
 		vec3 Rotation;
 		vec3 Scale;
-		mat4 ViewMatrix;
-		mat4 ProjectionMatrix;
-
 		Shader shader;
 
 	};

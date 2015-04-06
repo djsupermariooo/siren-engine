@@ -2,6 +2,7 @@
 #define SRN_DISPLAY_H
 
 #include <SRN_Platform.h>
+
 #include <glm/glm.hpp>
 #include <gl/glew.h>
 
@@ -18,4 +19,4 @@ public:
 	mat4 createViewMatrix(vec3 eye, vec3 center, vec3 up);
 };
 
-#endif
+#endif // SRN_DISPLAY_H

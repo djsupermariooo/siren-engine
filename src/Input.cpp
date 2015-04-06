@@ -5,6 +5,16 @@
 using namespace Siren;
 
 USHORT Input::key;
+bool Input::pressed;
+LONG Input::mouseX;
+LONG Input::mouseY;
+
+int Key::SRN_FORWARD;
+int Key::SRN_BACKWARD;
+int Key::SRN_RIGHT;
+int Key::SRN_LEFT;
+int Key::SRN_FULLSCREEN_TOGGLE;
+int Key::SRN_QUIT;
 
 Input::Input()
 {
@@ -12,6 +22,11 @@ Input::Input()
 
 Input::~Input()
 {
+}
+
+void Input::SetKeyToKeyCode(int keyid, int keyCode)
+{
+	keyid = keyCode;
 }
 
 int Input::ProcessInput(LPARAM lParam)
@@ -31,9 +46,19 @@ int Input::ProcessInput(LPARAM lParam)
 	{
 		if (raw->data.keyboard.Flags == RI_KEY_MAKE)
 		{
+			pressed = true;
 			Input::key = raw->data.keyboard.VKey;
-			std::cout << Input::key << std::endl;
 		}
+		else if (raw->data.keyboard.Flags == RI_KEY_BREAK)
+		{
+			pressed = false;
+			Input::key = 0;
+		}
+	}
+	else if (raw->header.dwType == RIM_TYPEMOUSE)
+	{
+		Input::mouseX = raw->data.mouse.lLastX;
+		Input::mouseY = raw->data.mouse.lLastY;
 	}
 	delete[] lpb;
 	return 0;
@@ -42,28 +67,42 @@ int Input::ProcessInput(LPARAM lParam)
 
 #elif defined(SRN_OS_MAC)
 
-#endif
+#endif // SRN_OS
 
 }
 
 USHORT Input::GetKeyPressed()
 {
 	USHORT keyPressed = Input::key;
-	Input::key = 0;
 	return keyPressed;
+}
+
+LONG Input::GetMouseX()
+{
+	return mouseX;
+}
+
+LONG Input::GetMouseY()
+{
+	return mouseY;
 }
 
 #ifdef SRN_OS_WINDOWS
 void Input::RegisterInputDevices()
 {
-	RAWINPUTDEVICE Rid[1];
+	RAWINPUTDEVICE Rid[2];
 
 	Rid[0].usUsagePage = 0x01;
 	Rid[0].usUsage = 0x06;
 	Rid[0].dwFlags = RIDEV_NOLEGACY;   // adds HID keyboard and also ignores legacy keyboard messages
 	Rid[0].hwndTarget = 0;
 
-	if (RegisterRawInputDevices(Rid, 1, sizeof(Rid[0])) == FALSE) {
+	Rid[1].usUsagePage = 0x01;
+	Rid[1].usUsage = 0x02;
+	Rid[1].dwFlags = RIDEV_NOLEGACY;
+	Rid[1].hwndTarget = 0;
+
+	if (RegisterRawInputDevices(Rid, 2, sizeof(Rid[0])) == FALSE) {
 		std::cout << "Registration failed." << std::endl;
 	}
 }

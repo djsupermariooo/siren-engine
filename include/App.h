@@ -1,10 +1,10 @@
 #ifndef SRN_APP_H
 #define SRN_APP_H
 
-#include <SRN_Platform.h>
 #include <GLUtil.h>
-#include <Time.h>
 #include <Input.h>
+#include <SRN_Platform.h>
+#include <Time.h>
 
 namespace Siren {
 
@@ -12,7 +12,7 @@ namespace Siren {
 	{
 	public:
 		// Constructor & Destructor
-		App(int width, int height, const char* title);
+		App(int width, int height, const char* title, bool fullscreen);
 		virtual ~App();
 
 		// Client called methods
@@ -21,8 +21,8 @@ namespace Siren {
 		virtual bool Init();
 
 		// Message Handler
-		virtual LRESULT MsgProc(HWND, UINT, WPARAM, LPARAM);
-		static LRESULT MainWndProc(HWND, UINT, WPARAM, LPARAM); //DELETE THIS
+		LRESULT MsgProc(HWND, UINT, WPARAM, LPARAM);
+		static LRESULT MainWndProc(HWND, UINT, WPARAM, LPARAM);
 
 		// Interface Methods
 		virtual void Update(float deltaTime) = 0;
@@ -36,13 +36,8 @@ namespace Siren {
 		void setHeight(UINT height);
 		UINT getHeight();
 
-	private:
-		// Delete this method before release
-		//void UpdateWindow();
-
 	protected:
 		HWND						m_hWnd;
-		HWND						m_hWnd_Child; //DELETE THIS
 		HINSTANCE					m_hAppInst;
 		HDC							m_hDC;
 		HGLRC						m_hRC;
@@ -50,11 +45,10 @@ namespace Siren {
 		UINT						m_ClientHeight;
 		DWORD						m_WndStyle;
 		char*						m_AppTitle;
-		bool						displayPyramid = false;
-		bool						displayCube = false;
+		bool						m_FullScreen;
 
 		bool InitWindow();
-		bool InitGL(HWND); //REMOVE HWND
+		bool InitGL();
 		void Shutdown();
 	};
 
