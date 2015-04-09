@@ -74,6 +74,53 @@ void Camera::Strafe(float speed)
 	Position.z += rightVector.z * speed;
 }
 
+void Camera::SetViewByController(int controllerX, int controllerY)
+{
+	float cX = 0;
+	float cY = 0;
+	if (controllerX > 10000 || controllerX < -10000)
+		cX = controllerX;
+	if (controllerY > 10000 || controllerY < -10000)
+		cY = controllerY;
+
+	cY = -cY;
+
+	float magnitude = sqrt(cX*cX + cY*cY);
+	if (magnitude == 0)
+		magnitude = 1;
+
+	float normalizedX = cX / magnitude;
+	float normalizedY = cY / magnitude;
+
+	float normalizedMagnitude = 0;
+
+	if (magnitude > 10000)
+	{
+		if (magnitude > 32767) 
+			magnitude = 32767;
+
+		magnitude -= 10000;
+		normalizedMagnitude = magnitude / (32767 - 10000);
+	}
+	else
+	{
+		magnitude = 0.0;
+		normalizedMagnitude = 0.0;
+	}
+
+	Yaw += normalizedX * 0.0006;
+	Pitch += normalizedY * 0.0006;
+
+	if (Yaw < 0)
+		Yaw = 2 * PI;
+
+	if (Pitch > radians(75.0f))
+		Pitch = radians(75.0f);
+
+	if (Pitch < radians(-75.0f))
+		Pitch = radians(-75.0f);
+}
+
 void Camera::SetViewByMouse(float offsetX, float offsetY)
 {
 	Yaw += offsetX * MouseSpeed;

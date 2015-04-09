@@ -37,6 +37,7 @@ namespace Siren {
 		UINT getHeight();
 
 	protected:
+		// Fields
 		HWND						m_hWnd;
 		HINSTANCE					m_hAppInst;
 		HDC							m_hDC;
@@ -46,6 +47,7 @@ namespace Siren {
 		DWORD						m_WndStyle;
 		char*						m_AppTitle;
 		bool						m_FullScreen;
+		DEVMODE						dmScreenSettings;
 
 		bool InitWindow();
 		bool InitGL();
@@ -54,4 +56,4 @@ namespace Siren {
 
 }
 
-#endif
+#endif // SRN_APP_H

@@ -1,3 +1,4 @@
+#include <App.h>
 #include <Color.h>
 #include <Display.h>
 

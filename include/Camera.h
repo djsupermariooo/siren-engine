@@ -33,6 +33,7 @@ namespace Siren {
 		void SetSpeed(float speed) { Speed = speed; }
 		float GetRotationSpeed() { return RotationSpeed; }
 		void SetRotationSpeed(float speed) { RotationSpeed = speed; }
+		void SetViewByController(int controllerX, int controllerY);
 		void SetViewByMouse(float mouseX, float mouseY);
 		void PositionCamera(float positionX, float positionY, float positionZ, float yaw, float pitch);
 		void MoveCamera(float speed);

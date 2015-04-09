@@ -55,6 +55,7 @@ GLint App::Run()
 
 			// UPDATE
 			Update(deltaTime);
+
 			// RENDER
 			Render();
 
@@ -75,7 +76,7 @@ GLint App::Run()
 
 bool App::InitWindow()
 {
-	// WNDCLASSEX STRUCTURE
+	// WINDOW SETTINGS
 	WNDCLASSEX wcex;
 	ZeroMemory(&wcex, sizeof(WNDCLASSEX));
 	wcex.cbClsExtra = 0;
@@ -90,35 +91,20 @@ bool App::InitWindow()
 	wcex.lpszMenuName = NULL;
 	wcex.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
 
+	// REGISTER WINDOW CLASS
 	if (!RegisterClassEx(&wcex)) return OutErrorMsg("Could not register the window class.");
 
-	if (m_FullScreen)														// Attempt fullscreen mode?
+	// SET TO FULLSCREEN OR WINDOW
+	if (m_FullScreen)
 	{
-		DEVMODE dmScreenSettings;											// Device mode
-		memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));				// Make sure memory is cleared
-		dmScreenSettings.dmSize = sizeof(dmScreenSettings);					// Size of the devmode structure
-		dmScreenSettings.dmPelsWidth = m_ClientWidth;						// Selected screen width
-		dmScreenSettings.dmPelsHeight = m_ClientHeight;						// Selected screen height
-		dmScreenSettings.dmBitsPerPel = 32;									// Selected bits per pixel
+		memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));
+		dmScreenSettings.dmSize = sizeof(dmScreenSettings);
+		dmScreenSettings.dmPelsWidth = m_ClientWidth;
+		dmScreenSettings.dmPelsHeight = m_ClientHeight;
+		dmScreenSettings.dmBitsPerPel = 32;
 		dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 
-		// Try to set selected mode and get results. Note: CDS_FULLSCREEN gets rid of start bar
-		std::cout << ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) << std::endl;
-		if (ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
-		{
-			// If the mode fails, offer two options. Quit or run in a window
-			if (MessageBox(NULL, "The requested fullscreen mode is not supported by \nyour video card. Use windowed mode instead?",
-				"MM GL", MB_YESNO | MB_ICONEXCLAMATION) == IDYES)
-			{
-				m_FullScreen = FALSE;											// Select windowed mode
-			}
-			else
-			{
-				// Pop up a message box letting user know the program is closing
-				MessageBox(NULL, "Program will now close.", "ERROR", MB_OK | MB_ICONEXCLAMATION);
-				return FALSE;												// Exit and return false
-			}
-		}
+		ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN);
 	}
 
 	if (m_FullScreen)
@@ -146,6 +132,7 @@ bool App::InitWindow()
 	// SHOW WINDOW
 	ShowWindow(m_hWnd, SW_SHOW);
 
+	// REGISTER INPUT DEVICES
 	Input::RegisterInputDevices();
 
 	return true;

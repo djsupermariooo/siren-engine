@@ -1,13 +1,23 @@
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+//		INPUT CLASS																					//
+//////////////////////////////////////////////////////////////////////////////////////////////////////	
+
 #include "Input.h"
 #include "SRN_Platform.h"
 #include <iostream>
 
 using namespace Siren;
 
+////////////////////
+//		STATIC VARIABLES
+///////////////////
+
 USHORT Input::key;
 bool Input::pressed;
 LONG Input::mouseX;
 LONG Input::mouseY;
+XINPUT_STATE Input::controllerState;
+int Input::controllerNum;
 
 int Key::SRN_FORWARD;
 int Key::SRN_BACKWARD;
@@ -16,14 +26,22 @@ int Key::SRN_LEFT;
 int Key::SRN_FULLSCREEN_TOGGLE;
 int Key::SRN_QUIT;
 
+///////////////////
+//		CONSTRUCTOR
+//////////////////
+
 Input::Input()
 {
 }
 
+//////////////////
+//		DESTRUCTOR
+/////////////////
+
 Input::~Input()
 {
 }
-
+	
 void Input::SetKeyToKeyCode(int keyid, int keyCode)
 {
 	keyid = keyCode;
@@ -77,16 +95,6 @@ USHORT Input::GetKeyPressed()
 	return keyPressed;
 }
 
-LONG Input::GetMouseX()
-{
-	return mouseX;
-}
-
-LONG Input::GetMouseY()
-{
-	return mouseY;
-}
-
 #ifdef SRN_OS_WINDOWS
 void Input::RegisterInputDevices()
 {
@@ -94,7 +102,7 @@ void Input::RegisterInputDevices()
 
 	Rid[0].usUsagePage = 0x01;
 	Rid[0].usUsage = 0x06;
-	Rid[0].dwFlags = RIDEV_NOLEGACY;   // adds HID keyboard and also ignores legacy keyboard messages
+	Rid[0].dwFlags = RIDEV_NOLEGACY;
 	Rid[0].hwndTarget = 0;
 
 	Rid[1].usUsagePage = 0x01;
@@ -106,4 +114,37 @@ void Input::RegisterInputDevices()
 		std::cout << "Registration failed." << std::endl;
 	}
 }
-#endif
+
+void Input::vibrateController(int leftVal, int rightVal)
+{
+	XINPUT_VIBRATION vibration;
+	ZeroMemory(&vibration, sizeof(XINPUT_VIBRATION));
+	vibration.wLeftMotorSpeed = leftVal;
+	vibration.wRightMotorSpeed = rightVal;
+
+	XInputSetState(controllerNum, &vibration);
+}
+
+bool Input::isControllerConnected()
+{
+	ZeroMemory(&controllerState, sizeof(XINPUT_STATE));
+	DWORD Result = XInputGetState(controllerNum, &controllerState);
+	if (Result == ERROR_SUCCESS)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+XINPUT_STATE Input::getControllerState()
+{
+	ZeroMemory(&controllerState, sizeof(XINPUT_STATE));
+	XInputGetState(controllerNum, &controllerState);
+
+	return controllerState;
+}
+
+#endif // SRN_OS
